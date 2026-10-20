@@ -158,11 +158,97 @@ queue is; the custodian must recognize the vault. Skip any one and the loop reve
 **not** require a testnet. The acceptance command for every exercise is `make exercise` — green when
 you are done.
 
+```test result
+root@codespaces-59b61e:/workspaces/rwa-lab-2026# make exercise
+forge test --match-path 'test/exercises/*.t.sol' -vv
+[⠒] Compiling...
+[⠆] Compiling 1 files with Solc 0.8.24
+[⠰] Solc 0.8.24 finished in 2.12s
+Compiler run successful!
+
+Ran 7 tests for test/exercises/01_BridgeTasks.t.sol:BridgeTasksTest
+[PASS] test_Ex2_RealHoldingsIsJustANumber() (gas: 72667)
+[PASS] test_Ex2_SharesExistWhileTheCustodianHoldsNothing() (gas: 262669)
+[PASS] test_Ex3_OneCallMovesTheWholeBook() (gas: 582039)
+Logs:
+  aliceclaimvalue:  1000000000
+  bobclaimvalue:  1000000000
+  aliceclaimvalue2:  50000000000
+  bobclaimvalue2:  50000000000
+
+[PASS] test_Ex3_TheClaimFloats_TheShareCountDoesNot() (gas: 334423)
+[PASS] test_Ex4_FreezeBeatsConfiscation() (gas: 377183)
+[PASS] test_Ex4_NoKyc_NoShares_EvenIfYouPay() (gas: 230024)
+[PASS] test_Ex4_TransferChecksBothEndpoints() (gas: 315032)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 10.05ms (4.50ms CPU time)
+
+Ran 11 tests for test/exercises/02_QueueTasks.t.sol:QueueTasksTest
+[PASS] test_Ex5_1_AssetsAtNav_AtHigherNav() (gas: 11485)
+[PASS] test_Ex5_1_AssetsAtNav_AtPar() (gas: 5804)
+[PASS] test_Ex5_2_Enqueue_EscrowsSharesAndLocksNav() (gas: 560980)
+[PASS] test_Ex5_2_Enqueue_LocksTheRate() (gas: 577245)
+[PASS] test_Ex5_3_Settle_NeedsTheVaultToHoldCash() (gas: 1101590)
+[PASS] test_Ex5_3_Settle_PartialFillCarriesTheRemainder() (gas: 1140091)
+[PASS] test_Ex5_3_Settle_PaysTheWholeQueue() (gas: 1177459)
+[PASS] test_Ex5_3_Settle_StopsWhenItCannotCoverTheHead() (gas: 565195)
+[PASS] test_Ex5_4_Claim_CannotBeDrawnTwice() (gas: 770713)
+[PASS] test_Ex5_4_Claim_PaysOutAndZeroesTheBalance() (gas: 792009)
+[PASS] test_Ex5_4_Claim_RevertsWithNothingToClaim() (gas: 34098)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 10.73ms (6.47ms CPU time)
+
+Ran 1 test for test/exercises/03_InvariantTasks.t.sol:InvariantTasksTest
+[PASS]
+InvariantTasksTest invariants:
+[PASS] invariant_EscrowConservation
+[PASS] invariant_SettlementSolvency
+ InvariantTasksTest invariants (runs: 256, calls: 128000, reverts: 0)
+
+╭---------------+-----------+-------+---------+----------╮
+| Contract      | Selector  | Calls | Reverts | Discards |
++========================================================+
+| BridgeHandler | attest    | 21312 | 0       | 0        |
+|---------------+-----------+-------+---------+----------|
+| BridgeHandler | claim     | 21244 | 0       | 0        |
+|---------------+-----------+-------+---------+----------|
+| BridgeHandler | enqueue   | 21325 | 0       | 0        |
+|---------------+-----------+-------+---------+----------|
+| BridgeHandler | fundVault | 21369 | 0       | 0        |
+|---------------+-----------+-------+---------+----------|
+| BridgeHandler | settle    | 21326 | 0       | 0        |
+|---------------+-----------+-------+---------+----------|
+| BridgeHandler | subscribe | 21424 | 0       | 0        |
+╰---------------+-----------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 14.07s (14.06s CPU time)
+
+Ran 3 test suites in 14.09s (14.09s CPU time): 19 tests passed, 0 failed, 0 skipped (19 total tests)
+```
+
 **Tier 2 (bonus)** — deploy to Sepolia and verify the source on Etherscan; put **all seven**
 addresses and their Etherscan links in your `README.md`, under a `## Deployment (Sepolia)` heading.
 The deploy prints them in this order: `MockUSDC`, `ComplianceRegistry`, `MockPriceFeed`,
 `TBillToken`, `MockTBillCustodian`, `TBillVault`, `RedemptionQueue`. The commands are Lab 1's
 `README.md` §4, under "Tier 2 (bonus)" — the flow is identical.
+
+```bash
+source .env
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --broadcast \
+  --verify \
+  --etherscan-api-key $ETHERSCAN_API_KEY \
+  --private-key $PRIVATE_KEY \
+  --gas-estimate-multiplier 2000
+```
+
+>MockUSDC: 0x9E4C89bBF2b59ea28bBCFEeC3A7775aeDEFE8981, https://sepolia.etherscan.io/address/0x9E4C89bBF2b59ea28bBCFEeC3A7775aeDEFE8981
+>ComplianceRegistry: 0x1a138846A033eBAd0a3Bf9Ea375e198Cd2C922e0, https://sepolia.etherscan.io/address/0x1a138846A033eBAd0a3Bf9Ea375e198Cd2C922e0
+>MockPriceFeed: 0x94E362049C2f32B4605F201CEc23a17B7457383a, https://sepolia.etherscan.io/address/0x94E362049C2f32B4605F201CEc23a17B7457383a
+>TBillToken: 0x5B2e2d276D7e906D1F42822551D8f5dC91Cc54D5, https://sepolia.etherscan.io/address/0x5B2e2d276D7e906D1F42822551D8f5dC91Cc54D5
+>MockTBillCustodian: 0xa77787529fBC1950E62E12a8eD27f5cbCfe181a9, https://sepolia.etherscan.io/address/0xa77787529fBC1950E62E12a8eD27f5cbCfe181a9
+>TBillVault: 0x92AE9329aBae11b90585598C32bBfd802c17F910, https://sepolia.etherscan.io/address/0x92AE9329aBae11b90585598C32bBfd802c17F910
+>RedemptionQueue: 0x022e264835B857a21103F66a5Fdb8Ff052cA20c0, https://sepolia.etherscan.io/address/0x022e264835B857a21103F66a5Fdb8Ff052cA20c0
+>Admin: 0xD4BF270e7056DDa525575a15eDFb961885Bb606c, https://sepolia.etherscan.io/address/0xD4BF270e7056DDa525575a15eDFb961885Bb606c
 
 **Tier 3 (challenge, optional)** — **Ex7**: `make challenge` (`test/challenges/FalseNav.t.sol`). The
 reporter's number is the chain's only window onto the asset; show what happens when it lies, and
@@ -215,6 +301,59 @@ What the zip must contain:
 2. Your answers to the discussion questions in `STUDENT-QUESTIONS.md`
 3. An architecture diagram in your `README.md` — a photo of a hand drawing is fine, but it must
    show the **four planks** and where cash and shares cross the bridge
+
+### Architecture: the four planks
+
+```mermaid
+flowchart LR
+    investor[Investor / holder]
+    reporter[Authorized NAV reporter]
+    spv[SPV / T-Bill seller]
+    bills[(Off-chain T-Bills)]
+
+    subgraph admission["ADMISSION — KYC-gated share ownership"]
+        registry["ComplianceRegistry<br/>whitelist"]
+        token["TBillToken<br/>tBILL shares"]
+        registry -->|"checks sender and receiver on mint, transfer, burn"| token
+    end
+
+    subgraph attestation["ATTESTATION — reported value"]
+        feedInterface["IPriceFeed"]
+        feed["MockPriceFeed<br/>8-decimal NAV"]
+        feedInterface -. "implemented by" .-> feed
+    end
+
+    subgraph custody["CUSTODY — cash buffer and off-chain asset"]
+        cash["MockUSDC<br/>6-decimal cash"]
+        vault["TBillVault<br/>subscription, NAV pricing,<br/>reserve buffer"]
+        custodian["MockTBillCustodian<br/>reported holdings"]
+        cash -->|"subscribe: USDC"| vault
+        vault -->|"invest: USDC"| custodian
+        custodian -. "custody represented off-chain;<br/>mock records a number only" .-> bills
+        spv -->|"T+1 sale proceeds:<br/>depositReserves"| vault
+    end
+
+    subgraph redemption["REDEMPTION — escrow, FIFO settlement, claim"]
+        queue["RedemptionQueue<br/>ticket and claimable USDC"]
+    end
+
+    investor -->|"approve + enqueue:<br/>tBILL shares escrowed"| queue
+    vault -->|"subscribe: mint tBILL"| token
+    reporter -->|"attest(NAV)"| vault
+    vault -->|"writes NAV"| feed
+    feed -->|"navPerShare used for pricing"| vault
+    queue -->|"locks payout at current NAV"| vault
+    queue -->|"settle: releaseReserves request"| vault
+    vault -->|"USDC reserves"| queue
+    queue -->|"settlement burns escrowed shares"| token
+    queue -->|"claim: USDC payout"| investor
+```
+
+**Flow key:** cash enters the vault on subscription, may be invested with the custodian, and
+returns from the SPV after a T+1 sale before the queue can settle and pay a claim. Shares are
+minted to admitted holders on subscription, escrowed by the queue on redemption, and burned when
+their ticket settles. The NAV reporter updates the feed through the vault; the feed is a reported
+number, not proof of custody. `ComplianceRegistry` gates every non-zero share-balance endpoint.
 
 ---
 
